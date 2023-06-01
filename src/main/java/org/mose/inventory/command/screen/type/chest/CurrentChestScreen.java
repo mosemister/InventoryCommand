@@ -15,7 +15,7 @@ import java.util.Optional;
 
 public class CurrentChestScreen<TValue> implements ChestScreen<TValue>, CurrentScreen<TValue> {
 
-    private ChestScreenSnapshot<TValue> basedOn;
+    private final ChestScreenSnapshot<TValue> basedOn;
     private InventoryView inventory;
     private int page;
 
@@ -51,8 +51,11 @@ public class CurrentChestScreen<TValue> implements ChestScreen<TValue>, CurrentS
     }
 
     @Override
-    public Component displayName() {
-        return this.inventory.title();
+    public Optional<Component> displayName() {
+        if (this.inventory == null) {
+            return this.basedOn.displayName();
+        }
+        return Optional.of(this.inventory.title());
     }
 
     @Override
@@ -83,18 +86,25 @@ public class CurrentChestScreen<TValue> implements ChestScreen<TValue>, CurrentS
         boolean isPaging = this.isPaged();
         ChestSizes size = ChestSizes.bestValue(slots.size());
 
-        Inventory bukkitInv = Bukkit.createInventory(player, size.size(), this.displayName());
+        Inventory bukkitInv;
+        if (this.displayName().isPresent()) {
+            bukkitInv = Bukkit.createInventory(player, size.size(), this.displayName().get());
+        } else {
+            bukkitInv = Bukkit.createInventory(player, size.size());
+        }
+        final Inventory finalBukkitInv = bukkitInv;
 
         //noinspection OptionalGetWithoutIsPresent
         slots
                 .stream()
                 .filter(slot -> slot.preferredPosition().isPresent())
-                .forEach(slot -> bukkitInv.setItem(slot.preferredPosition().getAsInt(), slot.createStack()));
-        slots.stream().filter(slot -> slot.preferredPosition().isEmpty()).forEach(slot -> bukkitInv.addItem(slot.createStack()));
+                .forEach(slot -> finalBukkitInv.setItem(slot.preferredPosition().getAsInt(), slot.createStack()));
+        slots.stream().filter(slot -> slot.preferredPosition().isEmpty()).forEach(slot -> finalBukkitInv.addItem(slot.createStack()));
 
         //TODO -> add paging slots
 
         this.inventory = player.openInventory(bukkitInv);
+        this.page = page;
     }
 
     public void setPage(int page) {
@@ -107,8 +117,11 @@ public class CurrentChestScreen<TValue> implements ChestScreen<TValue>, CurrentS
         if (this.isPaged()) {
             pageSize -= 9;
         }
-        int lower = Math.min(pageSize, totalNumberOfSlots) / page;
-        int higher = Math.min(totalNumberOfSlots - lower, pageSize);
+        int lower = Math.min(pageSize, totalNumberOfSlots) * (page - 1);
+        int higher = lower + pageSize;
+        if (higher > totalNumberOfSlots) {
+            higher = totalNumberOfSlots;
+        }
         return this.slots().subList(lower, higher);
     }
 }

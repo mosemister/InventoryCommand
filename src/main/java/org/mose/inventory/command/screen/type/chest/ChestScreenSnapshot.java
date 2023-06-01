@@ -8,6 +8,7 @@ import org.mose.inventory.command.slot.Slot;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class ChestScreenSnapshot<TValue> implements ScreenSnapshot<TValue>, ChestScreen<TValue> {
@@ -30,8 +31,8 @@ public class ChestScreenSnapshot<TValue> implements ScreenSnapshot<TValue>, Ches
     }
 
     @Override
-    public Component displayName() {
-        return this.displayName;
+    public Optional<Component> displayName() {
+        return Optional.ofNullable(this.displayName);
     }
 
     @Override

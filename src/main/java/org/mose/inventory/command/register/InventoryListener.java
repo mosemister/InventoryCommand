@@ -47,6 +47,7 @@ public class InventoryListener implements Listener {
         for (Consumer<SlotClickEvent> consumer : slot.onClick()) {
             consumer.accept(slotEvent);
         }
+        this.onInventoryInteract(slotEvent);
     }
 
     private void onInventoryInteract(SlotEvent<?> interact) {

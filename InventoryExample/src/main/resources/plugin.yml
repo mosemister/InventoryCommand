@@ -1,0 +1,7 @@
+name: InventoryExample
+version: '${project.version}'
+main: org.mose.example.InventoryExample
+api-version: 1.19
+commands:
+  test:
+    usage: /test

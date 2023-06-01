@@ -12,6 +12,10 @@ public class InventoryCommandBuilder {
     private Consumer<InventoryCommandContext> onFinish;
     private ScreenSnapshot<?> startingScreen;
 
+    public InventoryCommand build() {
+        return new InventoryCommand(this);
+    }
+
     public Supplier<InventoryContextManager> manager() {
         return manager;
     }

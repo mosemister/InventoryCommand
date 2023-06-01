@@ -4,7 +4,7 @@ import org.mose.inventory.command.screen.AbstractScreenBuilder;
 
 public class ChestScreenBuilder<TValue> extends AbstractScreenBuilder<TValue, ChestScreenBuilder<TValue>> {
 
-    private int maxSlotsPerPage;
+    private int maxSlotsPerPage = ChestSizes.X6.size();
 
     @Override
     public ChestScreenSnapshot<TValue> build() {

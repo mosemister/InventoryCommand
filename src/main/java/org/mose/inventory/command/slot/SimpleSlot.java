@@ -9,6 +9,7 @@ import org.mose.inventory.command.slot.events.SlotEvent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.OptionalInt;
+import java.util.concurrent.LinkedTransferQueue;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -19,15 +20,18 @@ class SimpleSlot<TValue> implements Slot<TValue> {
     private final Function<TValue, String> valueString;
     private final Supplier<ItemStack> createItem;
     private final Integer slot;
-    private Collection<Consumer<SlotClickEvent>> onClick;
-    private Collection<Consumer<SlotDragEvent>> onDrag;
-    private Collection<Consumer<SlotEvent<? extends InventoryEvent>>> onInteraction;
+    private Collection<Consumer<SlotClickEvent>> onClick = new LinkedTransferQueue<>();
+    private Collection<Consumer<SlotDragEvent>> onDrag = new LinkedTransferQueue<>();
+    private Collection<Consumer<SlotEvent<? extends InventoryEvent>>> onInteraction = new LinkedTransferQueue<>();
 
     SimpleSlot(SlotBuilder<TValue> builder) {
         this.value = builder.value();
         this.valueString = builder.stringValue();
         this.createItem = builder.stackCreate();
         this.slot = builder.index();
+        this.onClick.addAll(builder.onClick());
+        this.onDrag.addAll(builder.onDrag());
+        this.onInteraction.addAll(builder.onInteraction());
     }
 
     @Override

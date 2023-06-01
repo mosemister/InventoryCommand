@@ -9,10 +9,14 @@ public interface SlotEvent<TEvent extends InventoryEvent> {
 
     TEvent bukkitEvent();
 
+    default void complete() {
+        this.context().complete(this.slot().value());
+    }
+
     InventoryCommandContext context();
 
     default void nextScreen(ScreenSnapshot<?> newScreen) {
-        context().nextScreen(slot().value(), newScreen);
+        this.context().nextScreen(this.slot().value(), newScreen);
     }
 
     Slot<?> slot();
